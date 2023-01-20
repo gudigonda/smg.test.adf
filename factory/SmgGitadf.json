@@ -1,0 +1,9 @@
+{
+	"name": "SmgGitadf",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "93bdaa3c-703c-493d-a862-74f1295cc35f",
+		"tenantId": "f08afdc4-69d3-44ad-93fa-30f2a90c14ea"
+	}
+}
