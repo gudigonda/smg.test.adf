@@ -1,0 +1,24 @@
+first code
+
+dbutils.fs.mount(
+  source = "wasbs://sinkfile@smgblobstorage.blob.core.windows.net",
+  mount_point = "/mnt/iotdata",
+  extra_configs = {"fs.azure.account.key.smgblobstorage.blob.core.windows.net":dbutils.secrets.get(scope = "secretKey", key = "storageKey")}
+)
+
+
+
+dbutils.fs.ls("/mnt/iotdata/")
+df = spark.read.csv("dbfs:/mnt/iotdata/part-00000-3af3b56c-d057-40ea-806b-ddd060d86fdc-c000.csv")
+
+
+%sql
+CREATE DATABASE iotdata
+LOCATION "/mnt/iotdata"
+
+
+df.write.saveAsTable("iotdata.devices")
+
+
+%sql
+SELECT * FROM iotdata.devices LIMIT 10
