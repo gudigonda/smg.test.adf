@@ -1,9 +1,9 @@
 {
-	"name": "pipeline1",
+	"name": "PL_Child_Archeiving_Raw_To_Bronze",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
+				"name": "Copy_Archiving",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -16,18 +16,22 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010",
-						"requestMethod": "GET",
-						"paginationRules": {
-							"supportRFC5988": "true"
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFileName": "*.json",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
 						}
 					},
 					"sink": {
 						"type": "JsonSink",
 						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "PreserveHierarchy"
 						},
 						"formatSettings": {
 							"type": "JsonWriteSettings"
@@ -37,29 +41,18 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "RestResource1",
-						"type": "DatasetReference",
-						"parameters": {
-							"DS_Param_WhereClause": {
-								"value": "@pipeline().parameters.PL_Param_WhereClause",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "DS_Bronze_Source",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_Raw_Sink",
+						"referenceName": "DS_Bronze_Sink_Archive",
 						"type": "DatasetReference"
 					}
 				]
 			}
 		],
-		"parameters": {
-			"PL_Param_WhereClause": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"lastPublishTime": "2023-01-24T15:26:15Z"
 	},

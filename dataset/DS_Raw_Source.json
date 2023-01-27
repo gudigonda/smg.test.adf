@@ -1,0 +1,28 @@
+{
+	"name": "DS_Raw_Source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_smgblobgen2raw",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DS_Param_FolderPath": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().DS_Param_FolderPath",
+					"type": "Expression"
+				},
+				"fileSystem": "raw"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

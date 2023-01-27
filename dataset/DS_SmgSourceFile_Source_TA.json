@@ -1,0 +1,198 @@
+{
+	"name": "DS_SmgSourceFile_Source_TA",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1_ES",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "data_62704a4a-00a4-46ab-a6cd-35379b722855_1e78720d-9955-450f-959a-12b40b453e47.json",
+				"container": "smg-source-file"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"took": {
+					"type": "integer"
+				},
+				"timed_out": {
+					"type": "boolean"
+				},
+				"_shards": {
+					"type": "object",
+					"properties": {
+						"total": {
+							"type": "integer"
+						},
+						"successful": {
+							"type": "integer"
+						},
+						"skipped": {
+							"type": "integer"
+						},
+						"failed": {
+							"type": "integer"
+						}
+					}
+				},
+				"hits": {
+					"type": "object",
+					"properties": {
+						"total": {
+							"type": "integer"
+						},
+						"max_score": {
+							"type": "number"
+						},
+						"hits": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"_index": {
+										"type": "string"
+									},
+									"_type": {
+										"type": "string"
+									},
+									"_id": {
+										"type": "string"
+									},
+									"_score": {
+										"type": "number"
+									},
+									"_source": {
+										"type": "object",
+										"properties": {
+											"responseId": {
+												"type": "string"
+											},
+											"source": {
+												"type": "integer"
+											},
+											"eventDate": {
+												"type": "string"
+											},
+											"eventDateLocal": {
+												"type": "string"
+											},
+											"receivedDate": {
+												"type": "string"
+											},
+											"messageRevision": {
+												"type": "integer"
+											},
+											"messageTextJobId": {
+												"type": "integer"
+											},
+											"messages": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"properties": {
+														"messageId": {
+															"type": "integer"
+														},
+														"fact": {
+															"type": "string"
+														},
+														"languageId": {
+															"type": "string"
+														},
+														"originalText": {
+															"type": "string"
+														},
+														"transcribed": {
+															"type": "boolean"
+														},
+														"sentiment": {
+															"type": "number"
+														},
+														"details": {
+															"type": "array"
+														},
+														"nSentiment": {
+															"type": "integer"
+														},
+														"sMGNSentiment": {
+															"type": "integer"
+														},
+														"searchScore": {
+															"type": "number"
+														},
+														"textLanguage": {
+															"type": "string"
+														}
+													}
+												}
+											},
+											"hasMessages": {
+												"type": "boolean"
+											},
+											"facts": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"properties": {
+														"key": {
+															"type": "string"
+														},
+														"valueType": {
+															"type": "integer"
+														},
+														"stringValue": {
+															"type": "string"
+														}
+													}
+												}
+											},
+											"term": {
+												"type": "string"
+											},
+											"zoneContinent": {
+												"type": "integer"
+											},
+											"zone0": {
+												"type": "integer"
+											},
+											"zone1": {
+												"type": "integer"
+											},
+											"zone2": {
+												"type": "integer"
+											},
+											"unitId": {
+												"type": "integer"
+											},
+											"methodologyId": {
+												"type": "integer"
+											},
+											"externalLevel": {
+												"type": "string"
+											},
+											"externalKey": {
+												"type": "string"
+											},
+											"insertDateTime": {
+												"type": "string"
+											},
+											"updatedDateTime": {
+												"type": "string"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

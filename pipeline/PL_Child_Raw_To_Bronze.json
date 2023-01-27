@@ -1,0 +1,61 @@
+{
+	"name": "PL_Child_Raw_To_Bronze",
+	"properties": {
+		"activities": [
+			{
+				"name": "Exec_Consolidating",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_Child_Consolidating_Raw_To_Bronze",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PL_Param_FolderPath": {
+							"value": "@pipeline().parameters.PL_Param_FolderPath",
+							"type": "Expression"
+						},
+						"PL_Param_FolderPath_Sink": {
+							"value": "@pipeline().parameters.PL_Param_FolderPath_Sink",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Exec_Archeiving",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Exec_Consolidating",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_Child_Archeiving_Raw_To_Bronze",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"parameters": {
+			"PL_Param_FolderPath": {
+				"type": "string"
+			},
+			"PL_Param_FolderPath_Sink": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-01-24T15:26:16Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

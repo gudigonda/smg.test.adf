@@ -1,0 +1,21 @@
+{
+	"name": "DS_Raw_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_smgblobgen2raw",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "v20_response_162_2022_01",
+				"folderPath": "TA/TA/123DSI/1234A/1234P/2023/01/20",
+				"fileSystem": "raw"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

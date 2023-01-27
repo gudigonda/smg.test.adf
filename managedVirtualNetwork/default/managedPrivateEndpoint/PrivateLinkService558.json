@@ -1,0 +1,13 @@
+{
+	"name": "PrivateLinkService558",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/9820f8d5-04e0-488b-abfe-8eabc507c8f8/resourceGroups/smg-private-link-service-saas-useast-dev/providers/Microsoft.Network/privateLinkServices/smg-pls-internal-saas-useast-dev",
+		"groupId": "",
+		"fqdns": [
+			"srv-stage-elas-rpt.servicemanagement.com",
+			"srv_stage_elas_rpt.servicemanagement.com",
+			"ch-hdp-wrk032-p.servicemanagement.com",
+			"ch-hdp-wrk032-p-mgmt.servicemanagement.com"
+		]
+	}
+}

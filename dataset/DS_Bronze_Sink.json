@@ -1,0 +1,29 @@
+{
+	"name": "DS_Bronze_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_smgblobgen2raw",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DS_Param_FolderPath_Sink": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "v20_response_162_2022_01",
+				"folderPath": {
+					"value": "@dataset().DS_Param_FolderPath_Sink",
+					"type": "Expression"
+				},
+				"fileSystem": "bronze"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
