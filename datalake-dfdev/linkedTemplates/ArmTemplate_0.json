@@ -1,0 +1,1664 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "datalake-dfdev"
+		},
+		"AzureBlobStorage1_ES_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1_ES'"
+		},
+		"LS_smgblobgen2raw_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_smgblobgen2raw'"
+		},
+		"RestService1_ES_Test_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'RestService1_ES_Test'"
+		},
+		"Smg_RestService1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Smg_RestService1'"
+		},
+		"LS_smgblobgen2raw_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://smgblobraw.dfs.core.windows.net/"
+		},
+		"RestService1_ES_Test_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000"
+		},
+		"RestService1_ES_Test_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "srv_stage_denodo"
+		},
+		"Smg_RestService1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000"
+		},
+		"Smg_RestService1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "srv_stage_denodo"
+		},
+		"PrivateLinkService558_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9820f8d5-04e0-488b-abfe-8eabc507c8f8/resourceGroups/smg-private-link-service-saas-useast-dev/providers/Microsoft.Network/privateLinkServices/smg-pls-internal-saas-useast-dev"
+		},
+		"PrivateLinkService558_properties_groupId": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"PrivateLinkService558_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"srv-stage-elas-rpt.servicemanagement.com",
+				"srv_stage_elas_rpt.servicemanagement.com",
+				"ch-hdp-wrk032-p.servicemanagement.com",
+				"ch-hdp-wrk032-p-mgmt.servicemanagement.com"
+			]
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1_ES')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_ES_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_smgblobgen2raw')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_smgblobgen2raw_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_smgblobgen2raw_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime2SelfHosted')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Bronze_Sink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_smgblobgen2raw",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DS_Param_FolderPath_Sink": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "v20_response_162_2022_01",
+						"folderPath": {
+							"value": "@dataset().DS_Param_FolderPath_Sink",
+							"type": "Expression"
+						},
+						"fileSystem": "bronze"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_smgblobgen2raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Bronze_Sink_Archive')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_smgblobgen2raw",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Archive",
+						"fileSystem": "bronze"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_smgblobgen2raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Bronze_Source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_smgblobgen2raw",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "TA",
+						"fileSystem": "bronze"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_smgblobgen2raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Raw_Sink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_smgblobgen2raw",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "v20_response_162_2022_01",
+						"folderPath": "TA/TA/123DSI/1234A/1234P/2023/01/20",
+						"fileSystem": "raw"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_smgblobgen2raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Raw_Source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_smgblobgen2raw",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DS_Param_FolderPath": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().DS_Param_FolderPath",
+							"type": "Expression"
+						},
+						"fileSystem": "raw"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_smgblobgen2raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Silver_Sink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_smgblobgen2raw",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "silver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_smgblobgen2raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SmgSourceFile_Source_TA')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1_ES",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "data_62704a4a-00a4-46ab-a6cd-35379b722855_1e78720d-9955-450f-959a-12b40b453e47.json",
+						"container": "smg-source-file"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"took": {
+							"type": "integer"
+						},
+						"timed_out": {
+							"type": "boolean"
+						},
+						"_shards": {
+							"type": "object",
+							"properties": {
+								"total": {
+									"type": "integer"
+								},
+								"successful": {
+									"type": "integer"
+								},
+								"skipped": {
+									"type": "integer"
+								},
+								"failed": {
+									"type": "integer"
+								}
+							}
+						},
+						"hits": {
+							"type": "object",
+							"properties": {
+								"total": {
+									"type": "integer"
+								},
+								"max_score": {
+									"type": "number"
+								},
+								"hits": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"_index": {
+												"type": "string"
+											},
+											"_type": {
+												"type": "string"
+											},
+											"_id": {
+												"type": "string"
+											},
+											"_score": {
+												"type": "number"
+											},
+											"_source": {
+												"type": "object",
+												"properties": {
+													"responseId": {
+														"type": "string"
+													},
+													"source": {
+														"type": "integer"
+													},
+													"eventDate": {
+														"type": "string"
+													},
+													"eventDateLocal": {
+														"type": "string"
+													},
+													"receivedDate": {
+														"type": "string"
+													},
+													"messageRevision": {
+														"type": "integer"
+													},
+													"messageTextJobId": {
+														"type": "integer"
+													},
+													"messages": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"messageId": {
+																	"type": "integer"
+																},
+																"fact": {
+																	"type": "string"
+																},
+																"languageId": {
+																	"type": "string"
+																},
+																"originalText": {
+																	"type": "string"
+																},
+																"transcribed": {
+																	"type": "boolean"
+																},
+																"sentiment": {
+																	"type": "number"
+																},
+																"details": {
+																	"type": "array"
+																},
+																"nSentiment": {
+																	"type": "integer"
+																},
+																"sMGNSentiment": {
+																	"type": "integer"
+																},
+																"searchScore": {
+																	"type": "number"
+																},
+																"textLanguage": {
+																	"type": "string"
+																}
+															}
+														}
+													},
+													"hasMessages": {
+														"type": "boolean"
+													},
+													"facts": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"key": {
+																	"type": "string"
+																},
+																"valueType": {
+																	"type": "integer"
+																},
+																"stringValue": {
+																	"type": "string"
+																}
+															}
+														}
+													},
+													"term": {
+														"type": "string"
+													},
+													"zoneContinent": {
+														"type": "integer"
+													},
+													"zone0": {
+														"type": "integer"
+													},
+													"zone1": {
+														"type": "integer"
+													},
+													"zone2": {
+														"type": "integer"
+													},
+													"unitId": {
+														"type": "integer"
+													},
+													"methodologyId": {
+														"type": "integer"
+													},
+													"externalLevel": {
+														"type": "string"
+													},
+													"externalKey": {
+														"type": "string"
+													},
+													"insertDateTime": {
+														"type": "string"
+													},
+													"updatedDateTime": {
+														"type": "string"
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1_ES')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestService1_ES_Test')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "ES Test",
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestService1_ES_Test_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": false,
+					"authenticationType": "Basic",
+					"userName": "[parameters('RestService1_ES_Test_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('RestService1_ES_Test_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime2SelfHosted",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime2SelfHosted')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Smg_RestService1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Smg_RestService1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": false,
+					"authenticationType": "Basic",
+					"userName": "[parameters('Smg_RestService1_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Smg_RestService1_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime2SelfHosted",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime2SelfHosted')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "East US",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0,
+							"cleanup": false
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/PrivateLinkService558')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('PrivateLinkService558_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('PrivateLinkService558_properties_groupId')]",
+				"fqdns": "[parameters('PrivateLinkService558_properties_fqdns')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Child_Archeiving_Raw_To_Bronze')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_Archiving",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.json",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Bronze_Source",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Bronze_Sink_Archive",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-24T15:26:15Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Bronze_Source')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Bronze_Sink_Archive')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Child_Consolidating_Raw_To_Bronze')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_Consolidating",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.json",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "MergeFiles"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Raw_Source",
+								"type": "DatasetReference",
+								"parameters": {
+									"DS_Param_FolderPath": {
+										"value": "@pipeline().parameters.PL_Param_FolderPath",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Bronze_Sink",
+								"type": "DatasetReference",
+								"parameters": {
+									"DS_Param_FolderPath_Sink": {
+										"value": "@pipeline().parameters.PL_Param_FolderPath_Sink",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"PL_Param_FolderPath": {
+						"type": "string"
+					},
+					"PL_Param_FolderPath_Sink": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-24T15:26:15Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Raw_Source')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Bronze_Sink')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ES_TA_Tables')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestService1_ES_Test",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/RestService1_ES_Test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Split_Bronze_To_Silver')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_SmgSourceFile_Source_TA",
+								"type": "DatasetReference"
+							},
+							"name": "SrcTAtables"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_Silver_Sink",
+								"type": "DatasetReference"
+							},
+							"name": "SinkHits"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_Silver_Sink",
+								"type": "DatasetReference"
+							},
+							"name": "SinkShards"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_Silver_Sink",
+								"type": "DatasetReference"
+							},
+							"name": "SinkHItsHits"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_Silver_Sink",
+								"type": "DatasetReference"
+							},
+							"name": "SinkSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_Silver_Sink",
+								"type": "DatasetReference"
+							},
+							"name": "SinkMessage"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_Silver_Sink",
+								"type": "DatasetReference"
+							},
+							"name": "SinkFact"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_Silver_Sink",
+								"type": "DatasetReference"
+							},
+							"name": "SinkDetails"
+						}
+					],
+					"transformations": [
+						{
+							"name": "FlatShardsField"
+						},
+						{
+							"name": "FlatHitsField"
+						},
+						{
+							"name": "AggrRemoveDuplicatesInHItsField"
+						},
+						{
+							"name": "AggrRemoveDuplicatesInShardsField"
+						},
+						{
+							"name": "SelectRequiredColumnsHits"
+						},
+						{
+							"name": "SelectRequiredColumnsShards"
+						},
+						{
+							"name": "FlatHitsHItsField"
+						},
+						{
+							"name": "AggrRemovedDuplicatesInHitsHits"
+						},
+						{
+							"name": "SelectRequiredColumnsHitsHits"
+						},
+						{
+							"name": "FlatSourceField"
+						},
+						{
+							"name": "AggrRemoveDuplicatesInSourceField"
+						},
+						{
+							"name": "SelectRequiredColumnsInSourceField"
+						},
+						{
+							"name": "FlatMessageField"
+						},
+						{
+							"name": "AggrRemoveDuplicatesInMessageField"
+						},
+						{
+							"name": "SelectRequiredColumnsInMessageField"
+						},
+						{
+							"name": "FlatFactField"
+						},
+						{
+							"name": "AggrRemoveDuplicatesInFactField"
+						},
+						{
+							"name": "SelectRequiredColumnsInFactField"
+						},
+						{
+							"name": "DerivAddExtraColumnsInShards"
+						},
+						{
+							"name": "DerivAddExtraColumnsInHits"
+						},
+						{
+							"name": "DerivAddExtraColumnsInHitsHits"
+						},
+						{
+							"name": "DerivAddExtraColumnsInSource"
+						},
+						{
+							"name": "DerivAddExtraColumnsInMessage"
+						},
+						{
+							"name": "DerivAddExtraColumnsInFact"
+						},
+						{
+							"name": "flatten1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "DerivAddExtraColumnsInDetails"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          took as integer,",
+						"          timed_out as boolean,",
+						"          {_shards} as (total as integer, successful as integer, skipped as integer, failed as integer),",
+						"          hits as (total as integer, max_score as double, hits as ({_index} as string, {_type} as string, {_id} as string, {_score} as double, {_source} as (responseId as string, source as integer, eventDate as string, eventDateLocal as string, receivedDate as string, messageRevision as integer, messageTextJobId as integer, messages as (messageId as integer, fact as string, languageId as string, originalText as string, transcribed as boolean, sentiment as double, details as string[], nSentiment as integer, sMGNSentiment as integer, searchScore as double, textLanguage as string)[], hasMessages as boolean, facts as (key as string, valueType as integer, stringValue as string)[], term as string, zoneContinent as integer, zone0 as integer, zone1 as integer, zone2 as integer, unitId as integer, methodologyId as integer, externalLevel as string, externalKey as string, insertDateTime as string, updatedDateTime as string))[])",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'documentPerLine') ~> SrcTAtables",
+						"SrcTAtables foldDown(unroll(hits.hits),",
+						"     mapColumn(",
+						"          took,",
+						"          timed_out,",
+						"          total = {_shards}.total,",
+						"          successful = {_shards}.successful,",
+						"          skipped = {_shards}.skipped,",
+						"          failed = {_shards}.failed",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> FlatShardsField",
+						"SrcTAtables foldDown(unroll(hits.hits),",
+						"     mapColumn(",
+						"          total = hits.total,",
+						"          max_score = hits.max_score",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> FlatHitsField",
+						"FlatHitsField aggregate(groupBy(total,",
+						"          max_score),",
+						"     count = count()) ~> AggrRemoveDuplicatesInHItsField",
+						"FlatShardsField aggregate(groupBy(took,",
+						"          timed_out,",
+						"          total,",
+						"          successful,",
+						"          skipped,",
+						"          failed),",
+						"     count = count()) ~> AggrRemoveDuplicatesInShardsField",
+						"AggrRemoveDuplicatesInHItsField select(mapColumn(",
+						"          total,",
+						"          max_score",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsHits",
+						"AggrRemoveDuplicatesInShardsField select(mapColumn(",
+						"          took,",
+						"          timed_out,",
+						"          total,",
+						"          successful,",
+						"          skipped,",
+						"          failed",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsShards",
+						"SrcTAtables foldDown(unroll(hits.hits),",
+						"     mapColumn(",
+						"          index = hits.hits.{_index},",
+						"          type = hits.hits.{_type},",
+						"          id = hits.hits.{_id},",
+						"          score = hits.hits.{_score}",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> FlatHitsHItsField",
+						"FlatHitsHItsField aggregate(groupBy(index,",
+						"          type,",
+						"          id,",
+						"          score),",
+						"     count = count()) ~> AggrRemovedDuplicatesInHitsHits",
+						"AggrRemovedDuplicatesInHitsHits select(mapColumn(",
+						"          index,",
+						"          type,",
+						"          id,",
+						"          score",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsHitsHits",
+						"SrcTAtables foldDown(unroll(hits.hits, hits.hits),",
+						"     mapColumn(",
+						"          responseId = hits.hits.{_source}.responseId,",
+						"          source = hits.hits.{_source}.source,",
+						"          eventDate = hits.hits.{_source}.eventDate,",
+						"          eventDateLocal = hits.hits.{_source}.eventDateLocal,",
+						"          receivedDate = hits.hits.{_source}.receivedDate,",
+						"          messageRevision = hits.hits.{_source}.messageRevision,",
+						"          messageTextJobId = hits.hits.{_source}.messageTextJobId,",
+						"          hasMessages = hits.hits.{_source}.hasMessages,",
+						"          term = hits.hits.{_source}.term,",
+						"          zoneContinent = hits.hits.{_source}.zoneContinent,",
+						"          zone0 = hits.hits.{_source}.zone0,",
+						"          zone1 = hits.hits.{_source}.zone1,",
+						"          zone2 = hits.hits.{_source}.zone2,",
+						"          unitId = hits.hits.{_source}.unitId,",
+						"          methodologyId = hits.hits.{_source}.methodologyId,",
+						"          externalLevel = hits.hits.{_source}.externalLevel,",
+						"          externalKey = hits.hits.{_source}.externalKey,",
+						"          insertDateTime = hits.hits.{_source}.insertDateTime,",
+						"          updatedDateTime = hits.hits.{_source}.updatedDateTime",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> FlatSourceField",
+						"FlatSourceField aggregate(groupBy(responseId,",
+						"          source,",
+						"          eventDate,",
+						"          eventDateLocal,",
+						"          receivedDate,",
+						"          messageRevision,",
+						"          messageTextJobId,",
+						"          hasMessages,",
+						"          term,",
+						"          zoneContinent,",
+						"          zone0,",
+						"          zone1,",
+						"          zone2,",
+						"          unitId,",
+						"          methodologyId,",
+						"          externalLevel,",
+						"          externalKey,",
+						"          insertDateTime,",
+						"          updatedDateTime),",
+						"     count = count()) ~> AggrRemoveDuplicatesInSourceField",
+						"AggrRemoveDuplicatesInSourceField select(mapColumn(",
+						"          responseId,",
+						"          source,",
+						"          eventDate,",
+						"          eventDateLocal,",
+						"          receivedDate,",
+						"          messageRevision,",
+						"          messageTextJobId,",
+						"          hasMessages,",
+						"          term,",
+						"          zoneContinent,",
+						"          zone0,",
+						"          zone1,",
+						"          zone2,",
+						"          unitId,",
+						"          methodologyId,",
+						"          externalLevel,",
+						"          externalKey,",
+						"          insertDateTime,",
+						"          updatedDateTime",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsInSourceField",
+						"SrcTAtables foldDown(unroll(hits.hits.{_source}.messages),",
+						"     mapColumn(",
+						"          messageId = hits.hits.{_source}.messages.messageId,",
+						"          fact = hits.hits.{_source}.messages.fact,",
+						"          languageId = hits.hits.{_source}.messages.languageId,",
+						"          originalText = hits.hits.{_source}.messages.originalText,",
+						"          transcribed = hits.hits.{_source}.messages.transcribed,",
+						"          sentiment = hits.hits.{_source}.messages.sentiment,",
+						"          nSentiment = hits.hits.{_source}.messages.nSentiment,",
+						"          sMGNSentiment = hits.hits.{_source}.messages.sMGNSentiment,",
+						"          searchScore = hits.hits.{_source}.messages.searchScore,",
+						"          textLanguage = hits.hits.{_source}.messages.textLanguage",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> FlatMessageField",
+						"FlatMessageField aggregate(groupBy(messageId,",
+						"          fact,",
+						"          languageId,",
+						"          originalText,",
+						"          transcribed,",
+						"          sentiment,",
+						"          nSentiment,",
+						"          sMGNSentiment,",
+						"          searchScore,",
+						"          textLanguage),",
+						"     count = count()) ~> AggrRemoveDuplicatesInMessageField",
+						"AggrRemoveDuplicatesInMessageField select(mapColumn(",
+						"          messageId,",
+						"          fact,",
+						"          languageId,",
+						"          originalText,",
+						"          transcribed,",
+						"          sentiment,",
+						"          nSentiment,",
+						"          sMGNSentiment,",
+						"          searchScore,",
+						"          textLanguage",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsInMessageField",
+						"SrcTAtables foldDown(unroll(hits.hits.{_source}.facts, hits.hits.{_source}.facts),",
+						"     mapColumn(",
+						"          key = hits.hits.{_source}.facts.key,",
+						"          valueType = hits.hits.{_source}.facts.valueType,",
+						"          stringValue = hits.hits.{_source}.facts.stringValue",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> FlatFactField",
+						"FlatFactField aggregate(groupBy(key,",
+						"          valueType,",
+						"          stringValue),",
+						"     count = count()) ~> AggrRemoveDuplicatesInFactField",
+						"AggrRemoveDuplicatesInFactField select(mapColumn(",
+						"          key,",
+						"          valueType,",
+						"          stringValue",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsInFactField",
+						"SelectRequiredColumnsShards derive(AccountId = '1234A',",
+						"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInShards",
+						"SelectRequiredColumnsHits derive(AccountId = '1234A',",
+						"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInHits",
+						"SelectRequiredColumnsHitsHits derive(AccountId = '1234A',",
+						"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInHitsHits",
+						"SelectRequiredColumnsInSourceField derive(AccountId = '1234A',",
+						"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInSource",
+						"SelectRequiredColumnsInMessageField derive(AccountId = '1234A',",
+						"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInMessage",
+						"SelectRequiredColumnsInFactField derive(AccountId = '1234A',",
+						"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInFact",
+						"SrcTAtables foldDown(unroll(hits.hits.{_source}.messages.details, hits.hits.{_source}.messages.details),",
+						"     mapColumn(",
+						"          details = hits.hits.{_source}.messages.details",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten1",
+						"flatten1 aggregate(groupBy(details),",
+						"     count = count()) ~> aggregate1",
+						"aggregate1 select(mapColumn(",
+						"          details",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 derive(AccountId = '1234A',",
+						"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInDetails",
+						"DerivAddExtraColumnsInHits sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:['TA_Hits'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> SinkHits",
+						"DerivAddExtraColumnsInShards sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:['TA_Shards'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> SinkShards",
+						"DerivAddExtraColumnsInHitsHits sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:['TA_Hits_Hits'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> SinkHItsHits",
+						"DerivAddExtraColumnsInSource sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:['TA_Hits_Hits_Source'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> SinkSource",
+						"DerivAddExtraColumnsInMessage sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:['TA_Hits_Hits_Souce_Messages'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> SinkMessage",
+						"DerivAddExtraColumnsInFact sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:['TA_Hits_Hits_Source_Facts'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> SinkFact",
+						"DerivAddExtraColumnsInDetails sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SinkDetails"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_SmgSourceFile_Source_TA')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Silver_Sink')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Child_Dumping_ES_To_Raw')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_ES_To_Raw",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['hits']['total']"
+										},
+										"sink": {
+											"name": "hits_total",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['max_score']"
+										},
+										"sink": {
+											"name": "max_score",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"path": "$['took']"
+										},
+										"sink": {
+											"name": "took",
+											"type": "Int16"
+										}
+									},
+									{
+										"source": {
+											"path": "$['timed_out']"
+										},
+										"sink": {
+											"name": "timed_out",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_shards']['total']"
+										},
+										"sink": {
+											"name": "_shards_total",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_shards']['successful']"
+										},
+										"sink": {
+											"name": "successful",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_shards']['skipped']"
+										},
+										"sink": {
+											"name": "skipped"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_shards']['failed']"
+										},
+										"sink": {
+											"name": "failed",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_index']"
+										},
+										"sink": {
+											"name": "_index",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_type']"
+										},
+										"sink": {
+											"name": "_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_id']"
+										},
+										"sink": {
+											"name": "_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_score']"
+										},
+										"sink": {
+											"name": "_score",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messageTextJobId']"
+										},
+										"sink": {
+											"name": "messageTextJobId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['source']"
+										},
+										"sink": {
+											"name": "source",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['externalLevel']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_externalLevel",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['facts'][0]['dateValue']"
+										},
+										"sink": {
+											"name": "dateValue",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['facts'][0]['valueType']"
+										},
+										"sink": {
+											"name": "valueType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['facts'][0]['key']"
+										},
+										"sink": {
+											"name": "key",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['hasMessages']"
+										},
+										"sink": {
+											"name": "hasMessages",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['externalKey']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_externalKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['eventDateLocal']"
+										},
+										"sink": {
+											"name": "eventDateLocal",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['historicalUnit']['externalKey']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_historicalUnit_externalKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['historicalUnit']['unitId']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_historicalUnit_unitId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['historicalUnit']['externalLevel']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_historicalUnit_externalLevel",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['historicalUnit']['units'][0]['externalKey']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_historicalUnit_units'][0]['externalKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['historicalUnit']['units'][0]['unitId']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_historicalUnit_units'][0]['unitId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['historicalUnit']['units'][0]['externalLevel']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_historicalUnit_units'][0]['externalLevel",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['originalText']"
+										},
+										"sink": {
+											"name": "originalText",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['sentiment']"
+										},
+										"sink": {
+											"name": "sentiment",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['fact']"
+										},
+										"sink": {
+											"name": "fact",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['transcribed']"
+										},
+										"sink": {
+											"name": "transcribed",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['languageId']"
+										},
+										"sink": {
+											"name": "languageId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['messageId']"
+										},
+										"sink": {
+											"name": "messageId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['details'][0]"
+										},
+										"sink": {
+											"name": "items",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messages'][0]['nSentiment']"
+										},
+										"sink": {
+											"name": "nSentiment",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['unitId']"
+										},
+										"sink": {
+											"name": "hits_hits'][0]['_source_unitId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['term']"
+										},
+										"sink": {
+											"name": "term",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['methodologyId']"
+										},
+										"sink": {
+											"name": "methodologyId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['messageRevision']"
+										},
+										"sink": {
+											"name": "messageRevision",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['receivedDate']"
+										},
+										"sink": {
+											"name": "receivedDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['responseId']"
+										},
+										"sink": {
+											"name": "responseId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['hits']['hits'][0]['_source']['eventDate']"
+										},
+										"sink": {
+											"name": "eventDate",
+											"type": "DateTime"
+										}
+									}
+								],
+								"collectionReference": ""
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_ES_TA_Tables",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Raw_Sink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-24T15:26:15Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ES_TA_Tables')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Raw_Sink')]"
+			]
+		}
+	]
+}

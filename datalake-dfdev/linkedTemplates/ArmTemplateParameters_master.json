@@ -1,0 +1,56 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "datalake-dfdev"
+		},
+		"AzureBlobStorage1_ES_connectionString": {
+			"value": ""
+		},
+		"LS_smgblobgen2raw_accountKey": {
+			"value": ""
+		},
+		"RestService1_ES_Test_password": {
+			"value": ""
+		},
+		"Smg_RestService1_password": {
+			"value": ""
+		},
+		"LS_smgblobgen2raw_properties_typeProperties_url": {
+			"value": "https://smgblobraw.dfs.core.windows.net/"
+		},
+		"RestService1_ES_Test_properties_typeProperties_url": {
+			"value": "https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000"
+		},
+		"RestService1_ES_Test_properties_typeProperties_userName": {
+			"value": "srv_stage_denodo"
+		},
+		"Smg_RestService1_properties_typeProperties_url": {
+			"value": "https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000"
+		},
+		"Smg_RestService1_properties_typeProperties_userName": {
+			"value": "srv_stage_denodo"
+		},
+		"PrivateLinkService558_properties_privateLinkResourceId": {
+			"value": "/subscriptions/9820f8d5-04e0-488b-abfe-8eabc507c8f8/resourceGroups/smg-private-link-service-saas-useast-dev/providers/Microsoft.Network/privateLinkServices/smg-pls-internal-saas-useast-dev"
+		},
+		"PrivateLinkService558_properties_groupId": {
+			"value": ""
+		},
+		"PrivateLinkService558_properties_fqdns": {
+			"value": [
+				"srv-stage-elas-rpt.servicemanagement.com",
+				"srv_stage_elas_rpt.servicemanagement.com",
+				"ch-hdp-wrk032-p.servicemanagement.com",
+				"ch-hdp-wrk032-p-mgmt.servicemanagement.com"
+			]
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

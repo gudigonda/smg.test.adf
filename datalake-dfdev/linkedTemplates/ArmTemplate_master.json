@@ -1,0 +1,151 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "datalake-dfdev"
+		},
+		"AzureBlobStorage1_ES_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1_ES'"
+		},
+		"LS_smgblobgen2raw_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_smgblobgen2raw'"
+		},
+		"RestService1_ES_Test_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'RestService1_ES_Test'"
+		},
+		"Smg_RestService1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Smg_RestService1'"
+		},
+		"LS_smgblobgen2raw_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://smgblobraw.dfs.core.windows.net/"
+		},
+		"RestService1_ES_Test_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000"
+		},
+		"RestService1_ES_Test_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "srv_stage_denodo"
+		},
+		"Smg_RestService1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000"
+		},
+		"Smg_RestService1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "srv_stage_denodo"
+		},
+		"PrivateLinkService558_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9820f8d5-04e0-488b-abfe-8eabc507c8f8/resourceGroups/smg-private-link-service-saas-useast-dev/providers/Microsoft.Network/privateLinkServices/smg-pls-internal-saas-useast-dev"
+		},
+		"PrivateLinkService558_properties_groupId": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"PrivateLinkService558_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"srv-stage-elas-rpt.servicemanagement.com",
+				"srv_stage_elas_rpt.servicemanagement.com",
+				"ch-hdp-wrk032-p.servicemanagement.com",
+				"ch-hdp-wrk032-p-mgmt.servicemanagement.com"
+			]
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "datalake-dfdev_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureBlobStorage1_ES_connectionString": {
+						"value": "[parameters('AzureBlobStorage1_ES_connectionString')]"
+					},
+					"LS_smgblobgen2raw_accountKey": {
+						"value": "[parameters('LS_smgblobgen2raw_accountKey')]"
+					},
+					"RestService1_ES_Test_password": {
+						"value": "[parameters('RestService1_ES_Test_password')]"
+					},
+					"Smg_RestService1_password": {
+						"value": "[parameters('Smg_RestService1_password')]"
+					},
+					"LS_smgblobgen2raw_properties_typeProperties_url": {
+						"value": "[parameters('LS_smgblobgen2raw_properties_typeProperties_url')]"
+					},
+					"RestService1_ES_Test_properties_typeProperties_url": {
+						"value": "[parameters('RestService1_ES_Test_properties_typeProperties_url')]"
+					},
+					"RestService1_ES_Test_properties_typeProperties_userName": {
+						"value": "[parameters('RestService1_ES_Test_properties_typeProperties_userName')]"
+					},
+					"Smg_RestService1_properties_typeProperties_url": {
+						"value": "[parameters('Smg_RestService1_properties_typeProperties_url')]"
+					},
+					"Smg_RestService1_properties_typeProperties_userName": {
+						"value": "[parameters('Smg_RestService1_properties_typeProperties_userName')]"
+					},
+					"PrivateLinkService558_properties_privateLinkResourceId": {
+						"value": "[parameters('PrivateLinkService558_properties_privateLinkResourceId')]"
+					},
+					"PrivateLinkService558_properties_groupId": {
+						"value": "[parameters('PrivateLinkService558_properties_groupId')]"
+					},
+					"PrivateLinkService558_properties_fqdns": {
+						"value": "[parameters('PrivateLinkService558_properties_fqdns')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "datalake-dfdev_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'datalake-dfdev_ArmTemplate_0')]"
+			]
+		}
+	]
+}
