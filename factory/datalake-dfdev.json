@@ -1,0 +1,9 @@
+{
+	"name": "datalake-dfdev",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "44baa46e-18c6-478b-83af-92885912fd0c",
+		"tenantId": "f08afdc4-69d3-44ad-93fa-30f2a90c14ea"
+	}
+}

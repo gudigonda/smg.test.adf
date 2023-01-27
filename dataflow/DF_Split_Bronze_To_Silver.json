@@ -1,0 +1,453 @@
+{
+	"name": "DF_Split_Bronze_To_Silver",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_SmgSourceFile_Source_TA",
+						"type": "DatasetReference"
+					},
+					"name": "SrcTAtables"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_Silver_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "SinkHits"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Silver_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "SinkShards"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Silver_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "SinkHItsHits"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Silver_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "SinkSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Silver_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "SinkMessage"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Silver_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "SinkFact"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Silver_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "SinkDetails"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FlatShardsField"
+				},
+				{
+					"name": "FlatHitsField"
+				},
+				{
+					"name": "AggrRemoveDuplicatesInHItsField"
+				},
+				{
+					"name": "AggrRemoveDuplicatesInShardsField"
+				},
+				{
+					"name": "SelectRequiredColumnsHits"
+				},
+				{
+					"name": "SelectRequiredColumnsShards"
+				},
+				{
+					"name": "FlatHitsHItsField"
+				},
+				{
+					"name": "AggrRemovedDuplicatesInHitsHits"
+				},
+				{
+					"name": "SelectRequiredColumnsHitsHits"
+				},
+				{
+					"name": "FlatSourceField"
+				},
+				{
+					"name": "AggrRemoveDuplicatesInSourceField"
+				},
+				{
+					"name": "SelectRequiredColumnsInSourceField"
+				},
+				{
+					"name": "FlatMessageField"
+				},
+				{
+					"name": "AggrRemoveDuplicatesInMessageField"
+				},
+				{
+					"name": "SelectRequiredColumnsInMessageField"
+				},
+				{
+					"name": "FlatFactField"
+				},
+				{
+					"name": "AggrRemoveDuplicatesInFactField"
+				},
+				{
+					"name": "SelectRequiredColumnsInFactField"
+				},
+				{
+					"name": "DerivAddExtraColumnsInShards"
+				},
+				{
+					"name": "DerivAddExtraColumnsInHits"
+				},
+				{
+					"name": "DerivAddExtraColumnsInHitsHits"
+				},
+				{
+					"name": "DerivAddExtraColumnsInSource"
+				},
+				{
+					"name": "DerivAddExtraColumnsInMessage"
+				},
+				{
+					"name": "DerivAddExtraColumnsInFact"
+				},
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "DerivAddExtraColumnsInDetails"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          took as integer,",
+				"          timed_out as boolean,",
+				"          {_shards} as (total as integer, successful as integer, skipped as integer, failed as integer),",
+				"          hits as (total as integer, max_score as double, hits as ({_index} as string, {_type} as string, {_id} as string, {_score} as double, {_source} as (responseId as string, source as integer, eventDate as string, eventDateLocal as string, receivedDate as string, messageRevision as integer, messageTextJobId as integer, messages as (messageId as integer, fact as string, languageId as string, originalText as string, transcribed as boolean, sentiment as double, details as string[], nSentiment as integer, sMGNSentiment as integer, searchScore as double, textLanguage as string)[], hasMessages as boolean, facts as (key as string, valueType as integer, stringValue as string)[], term as string, zoneContinent as integer, zone0 as integer, zone1 as integer, zone2 as integer, unitId as integer, methodologyId as integer, externalLevel as string, externalKey as string, insertDateTime as string, updatedDateTime as string))[])",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> SrcTAtables",
+				"SrcTAtables foldDown(unroll(hits.hits),",
+				"     mapColumn(",
+				"          took,",
+				"          timed_out,",
+				"          total = {_shards}.total,",
+				"          successful = {_shards}.successful,",
+				"          skipped = {_shards}.skipped,",
+				"          failed = {_shards}.failed",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlatShardsField",
+				"SrcTAtables foldDown(unroll(hits.hits),",
+				"     mapColumn(",
+				"          total = hits.total,",
+				"          max_score = hits.max_score",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlatHitsField",
+				"FlatHitsField aggregate(groupBy(total,",
+				"          max_score),",
+				"     count = count()) ~> AggrRemoveDuplicatesInHItsField",
+				"FlatShardsField aggregate(groupBy(took,",
+				"          timed_out,",
+				"          total,",
+				"          successful,",
+				"          skipped,",
+				"          failed),",
+				"     count = count()) ~> AggrRemoveDuplicatesInShardsField",
+				"AggrRemoveDuplicatesInHItsField select(mapColumn(",
+				"          total,",
+				"          max_score",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsHits",
+				"AggrRemoveDuplicatesInShardsField select(mapColumn(",
+				"          took,",
+				"          timed_out,",
+				"          total,",
+				"          successful,",
+				"          skipped,",
+				"          failed",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsShards",
+				"SrcTAtables foldDown(unroll(hits.hits),",
+				"     mapColumn(",
+				"          index = hits.hits.{_index},",
+				"          type = hits.hits.{_type},",
+				"          id = hits.hits.{_id},",
+				"          score = hits.hits.{_score}",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlatHitsHItsField",
+				"FlatHitsHItsField aggregate(groupBy(index,",
+				"          type,",
+				"          id,",
+				"          score),",
+				"     count = count()) ~> AggrRemovedDuplicatesInHitsHits",
+				"AggrRemovedDuplicatesInHitsHits select(mapColumn(",
+				"          index,",
+				"          type,",
+				"          id,",
+				"          score",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsHitsHits",
+				"SrcTAtables foldDown(unroll(hits.hits, hits.hits),",
+				"     mapColumn(",
+				"          responseId = hits.hits.{_source}.responseId,",
+				"          source = hits.hits.{_source}.source,",
+				"          eventDate = hits.hits.{_source}.eventDate,",
+				"          eventDateLocal = hits.hits.{_source}.eventDateLocal,",
+				"          receivedDate = hits.hits.{_source}.receivedDate,",
+				"          messageRevision = hits.hits.{_source}.messageRevision,",
+				"          messageTextJobId = hits.hits.{_source}.messageTextJobId,",
+				"          hasMessages = hits.hits.{_source}.hasMessages,",
+				"          term = hits.hits.{_source}.term,",
+				"          zoneContinent = hits.hits.{_source}.zoneContinent,",
+				"          zone0 = hits.hits.{_source}.zone0,",
+				"          zone1 = hits.hits.{_source}.zone1,",
+				"          zone2 = hits.hits.{_source}.zone2,",
+				"          unitId = hits.hits.{_source}.unitId,",
+				"          methodologyId = hits.hits.{_source}.methodologyId,",
+				"          externalLevel = hits.hits.{_source}.externalLevel,",
+				"          externalKey = hits.hits.{_source}.externalKey,",
+				"          insertDateTime = hits.hits.{_source}.insertDateTime,",
+				"          updatedDateTime = hits.hits.{_source}.updatedDateTime",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlatSourceField",
+				"FlatSourceField aggregate(groupBy(responseId,",
+				"          source,",
+				"          eventDate,",
+				"          eventDateLocal,",
+				"          receivedDate,",
+				"          messageRevision,",
+				"          messageTextJobId,",
+				"          hasMessages,",
+				"          term,",
+				"          zoneContinent,",
+				"          zone0,",
+				"          zone1,",
+				"          zone2,",
+				"          unitId,",
+				"          methodologyId,",
+				"          externalLevel,",
+				"          externalKey,",
+				"          insertDateTime,",
+				"          updatedDateTime),",
+				"     count = count()) ~> AggrRemoveDuplicatesInSourceField",
+				"AggrRemoveDuplicatesInSourceField select(mapColumn(",
+				"          responseId,",
+				"          source,",
+				"          eventDate,",
+				"          eventDateLocal,",
+				"          receivedDate,",
+				"          messageRevision,",
+				"          messageTextJobId,",
+				"          hasMessages,",
+				"          term,",
+				"          zoneContinent,",
+				"          zone0,",
+				"          zone1,",
+				"          zone2,",
+				"          unitId,",
+				"          methodologyId,",
+				"          externalLevel,",
+				"          externalKey,",
+				"          insertDateTime,",
+				"          updatedDateTime",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsInSourceField",
+				"SrcTAtables foldDown(unroll(hits.hits.{_source}.messages),",
+				"     mapColumn(",
+				"          messageId = hits.hits.{_source}.messages.messageId,",
+				"          fact = hits.hits.{_source}.messages.fact,",
+				"          languageId = hits.hits.{_source}.messages.languageId,",
+				"          originalText = hits.hits.{_source}.messages.originalText,",
+				"          transcribed = hits.hits.{_source}.messages.transcribed,",
+				"          sentiment = hits.hits.{_source}.messages.sentiment,",
+				"          nSentiment = hits.hits.{_source}.messages.nSentiment,",
+				"          sMGNSentiment = hits.hits.{_source}.messages.sMGNSentiment,",
+				"          searchScore = hits.hits.{_source}.messages.searchScore,",
+				"          textLanguage = hits.hits.{_source}.messages.textLanguage",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlatMessageField",
+				"FlatMessageField aggregate(groupBy(messageId,",
+				"          fact,",
+				"          languageId,",
+				"          originalText,",
+				"          transcribed,",
+				"          sentiment,",
+				"          nSentiment,",
+				"          sMGNSentiment,",
+				"          searchScore,",
+				"          textLanguage),",
+				"     count = count()) ~> AggrRemoveDuplicatesInMessageField",
+				"AggrRemoveDuplicatesInMessageField select(mapColumn(",
+				"          messageId,",
+				"          fact,",
+				"          languageId,",
+				"          originalText,",
+				"          transcribed,",
+				"          sentiment,",
+				"          nSentiment,",
+				"          sMGNSentiment,",
+				"          searchScore,",
+				"          textLanguage",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsInMessageField",
+				"SrcTAtables foldDown(unroll(hits.hits.{_source}.facts, hits.hits.{_source}.facts),",
+				"     mapColumn(",
+				"          key = hits.hits.{_source}.facts.key,",
+				"          valueType = hits.hits.{_source}.facts.valueType,",
+				"          stringValue = hits.hits.{_source}.facts.stringValue",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlatFactField",
+				"FlatFactField aggregate(groupBy(key,",
+				"          valueType,",
+				"          stringValue),",
+				"     count = count()) ~> AggrRemoveDuplicatesInFactField",
+				"AggrRemoveDuplicatesInFactField select(mapColumn(",
+				"          key,",
+				"          valueType,",
+				"          stringValue",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumnsInFactField",
+				"SelectRequiredColumnsShards derive(AccountId = '1234A',",
+				"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInShards",
+				"SelectRequiredColumnsHits derive(AccountId = '1234A',",
+				"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInHits",
+				"SelectRequiredColumnsHitsHits derive(AccountId = '1234A',",
+				"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInHitsHits",
+				"SelectRequiredColumnsInSourceField derive(AccountId = '1234A',",
+				"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInSource",
+				"SelectRequiredColumnsInMessageField derive(AccountId = '1234A',",
+				"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInMessage",
+				"SelectRequiredColumnsInFactField derive(AccountId = '1234A',",
+				"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInFact",
+				"SrcTAtables foldDown(unroll(hits.hits.{_source}.messages.details, hits.hits.{_source}.messages.details),",
+				"     mapColumn(",
+				"          details = hits.hits.{_source}.messages.details",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 aggregate(groupBy(details),",
+				"     count = count()) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          details",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(AccountId = '1234A',",
+				"          ProgrammeId = '1234P') ~> DerivAddExtraColumnsInDetails",
+				"DerivAddExtraColumnsInHits sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:['TA_Hits'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkHits",
+				"DerivAddExtraColumnsInShards sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:['TA_Shards'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkShards",
+				"DerivAddExtraColumnsInHitsHits sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:['TA_Hits_Hits'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkHItsHits",
+				"DerivAddExtraColumnsInSource sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:['TA_Hits_Hits_Source'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkSource",
+				"DerivAddExtraColumnsInMessage sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:['TA_Hits_Hits_Souce_Messages'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkMessage",
+				"DerivAddExtraColumnsInFact sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:['TA_Hits_Hits_Source_Facts'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkFact",
+				"DerivAddExtraColumnsInDetails sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SinkDetails"
+			]
+		}
+	}
+}
