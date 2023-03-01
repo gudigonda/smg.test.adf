@@ -1,11 +1,11 @@
 {
-	"name": "AzureBlobStorage1_ES",
+	"name": "AzureKeyVaultDev",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
-		"type": "AzureBlobStorage",
+		"type": "AzureKeyVault",
 		"typeProperties": {
-			"connectionString": ""
+			"baseUrl": "https://smg-kv-dev.vault.azure.net/"
 		}
 	}
 }

@@ -14,12 +14,12 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"PL_Param_FolderPath": {
-							"value": "@pipeline().parameters.PL_Param_FolderPath",
+						"PL_Param_FolderPath_Raw": {
+							"value": "@pipeline().parameters.PL_Param_FolderPath_Raw",
 							"type": "Expression"
 						},
-						"PL_Param_FolderPath_Sink": {
-							"value": "@pipeline().parameters.PL_Param_FolderPath_Sink",
+						"PL_Param_FolderPath_Bronze": {
+							"value": "@pipeline().parameters.PL_Param_FolderPath_Bronze",
 							"type": "Expression"
 						}
 					}
@@ -47,15 +47,15 @@
 			}
 		],
 		"parameters": {
-			"PL_Param_FolderPath": {
+			"PL_Param_FolderPath_Raw": {
 				"type": "string"
 			},
-			"PL_Param_FolderPath_Sink": {
+			"PL_Param_FolderPath_Bronze": {
 				"type": "string"
 			}
 		},
 		"annotations": [],
-		"lastPublishTime": "2023-01-24T15:26:16Z"
+		"lastPublishTime": "2023-02-28T11:04:33Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

@@ -1,19 +1,18 @@
 {
-	"name": "DS_Bronze_Source",
+	"name": "DS_binary_sink",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_smgblobgen2raw",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
-		"type": "Json",
+		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileSystem": "bronze"
+				"fileSystem": "raw"
 			}
-		},
-		"schema": {}
+		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }

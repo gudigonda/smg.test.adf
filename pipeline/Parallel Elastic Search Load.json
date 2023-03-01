@@ -1,0 +1,464 @@
+{
+	"name": "Parallel Elastic Search Load",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Pit ID",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "KeyVault - Get Elastic Search API Key",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat(\n    pipeline().parameters.elastic_search_url,\n    pipeline().parameters.index_name,\n    '/_pit?keep_alive=5m'\n)",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Authorization": {
+							"value": "@activity('KeyVault - Get Elastic Search API Key').output.value",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"body": "none"
+					}
+				}
+			},
+			{
+				"name": "For Each Slice",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Pit ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set result_size",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set slice_array",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set json_directory",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('slice_array')",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 16,
+					"activities": [
+						{
+							"name": "Run ElasticScale Data Copy",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "ElasticSearchTest",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"result_size": {
+										"value": "@pipeline().parameters.result_size",
+										"type": "Expression"
+									},
+									"max_slices": {
+										"value": "@pipeline().parameters.number_of_slices",
+										"type": "Expression"
+									},
+									"slice_number": {
+										"value": "@string(item())",
+										"type": "Expression"
+									},
+									"pit_id": {
+										"value": "@activity('Get Pit ID').output.id",
+										"type": "Expression"
+									},
+									"parent_run_id": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"json_directory": {
+										"value": "@variables('json_directory_root')",
+										"type": "Expression"
+									},
+									"elastic_search_url": {
+										"value": "@pipeline().parameters.elastic_search_url",
+										"type": "Expression"
+									},
+									"keyvault_url": {
+										"value": "@pipeline().parameters.keyvault_url",
+										"type": "Expression"
+									},
+									"azure_function_url": {
+										"value": "@pipeline().parameters.azure_function_url",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set result_size",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "result_size",
+					"value": {
+						"value": "@pipeline().parameters.result_size",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set number of slices",
+				"description": "Number of slices is how many copies we should run in parallel from elasticsearch",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "number_of_slices",
+					"value": {
+						"value": "@pipeline().parameters.number_of_slices",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set slice_array",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set number of slices",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "slice_array",
+					"value": {
+						"value": "@range(0, int(variables('number_of_slices')))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Delete Pit ID",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "For Each Slice",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat(\n    pipeline().parameters.elastic_search_url,\n    '_pit'\n)",
+						"type": "Expression"
+					},
+					"method": "DELETE",
+					"headers": {
+						"Authorization": {
+							"value": "@activity('KeyVault - Get Elastic Search API Key').output.value",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"value": "@json(concat('{\"id\": \"', activity('Get Pit ID').output.id, '\"}'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Conform Hits to Parquet",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "For Each Slice",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": false,
+							"wildcardFolderPath": {
+								"value": "@variables('json_directory_root')",
+								"type": "Expression"
+							},
+							"wildcardFileName": "*.json",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "MergeFiles"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['_index']"
+								},
+								"sink": {
+									"name": "IndexName"
+								}
+							},
+							{
+								"source": {
+									"path": "['_type']"
+								},
+								"sink": {
+									"name": "DocumentType"
+								}
+							},
+							{
+								"source": {
+									"path": "['_id']"
+								},
+								"sink": {
+									"name": "ItemId"
+								}
+							},
+							{
+								"source": {
+									"path": "['_source']['host']"
+								},
+								"sink": {
+									"name": "GeneratingHost"
+								}
+							},
+							{
+								"source": {
+									"path": "['_source']['type']"
+								},
+								"sink": {
+									"name": "LogType"
+								}
+							},
+							{
+								"source": {
+									"path": "['_source']['@timestamp']"
+								},
+								"sink": {
+									"name": "LogTimestamp"
+								}
+							},
+							{
+								"source": {
+									"path": "['_source']['path']"
+								},
+								"sink": {
+									"name": "LogPath"
+								}
+							},
+							{
+								"source": {
+									"path": "['_source']['@version']"
+								},
+								"sink": {
+									"name": "DocumentVersion"
+								}
+							},
+							{
+								"source": {
+									"path": "['_source']['message']"
+								},
+								"sink": {
+									"name": "Message"
+								}
+							}
+						],
+						"collectionReference": "$['hits']['hits']",
+						"mapComplexValuesToString": false
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ElasticSearchJsonOutput",
+						"type": "DatasetReference",
+						"parameters": {
+							"foldername": "hold",
+							"filename": "hold"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ElasticSearchHitsParquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"parquet_directory": {
+								"value": "@concat(\n    'conformed/',\n    formatDateTime(utcNow(), 'yyyy-MM-dd'), '/',\n    pipeline().RunId\n)",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Set json_directory",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "json_directory_root",
+					"value": {
+						"value": "@concat(\n    'raw/',\n    formatDateTime(utcNow(), 'yyyy-MM-dd'), '/',\n    pipeline().RunId\n)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "KeyVault - Get Elastic Search API Key",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat(\r\n    pipeline().parameters.keyvault_url, \r\n    'secrets/',\r\n    'ElasticSearchAPI',\r\n    '?api-version=7.3'\r\n)",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"number_of_slices": {
+				"type": "string",
+				"defaultValue": "10"
+			},
+			"result_size": {
+				"type": "string",
+				"defaultValue": "5000"
+			},
+			"index_name": {
+				"type": "string",
+				"defaultValue": "logstash-2022.12.29-000001"
+			},
+			"elastic_search_url": {
+				"type": "string",
+				"defaultValue": "http://10.1.0.4:9200/"
+			},
+			"keyvault_url": {
+				"type": "string",
+				"defaultValue": "https://smg-elastic-keyvault.vault.azure.net/"
+			},
+			"azure_function_url": {
+				"type": "string",
+				"defaultValue": "https://elastic-process.azurewebsites.net/api/ElasticSearchResultProcessing"
+			}
+		},
+		"variables": {
+			"slice_array": {
+				"type": "Array"
+			},
+			"result_size": {
+				"type": "String"
+			},
+			"number_of_slices": {
+				"type": "String"
+			},
+			"max_shards": {
+				"type": "String"
+			},
+			"max_slices": {
+				"type": "String"
+			},
+			"current_slice": {
+				"type": "String"
+			},
+			"parent_run_id": {
+				"type": "String"
+			},
+			"json_directory": {
+				"type": "String"
+			},
+			"json_directory_root": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-02-15T10:14:45Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

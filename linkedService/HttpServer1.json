@@ -1,0 +1,26 @@
+{
+	"name": "HttpServer1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://srv-stage-elas-rpt.servicemanagement.com:9200/",
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Basic",
+			"userName": "srv_stage_denodo",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVaultDev",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "srv-stage-denodo-secret"
+			}
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime2SelfHosted",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

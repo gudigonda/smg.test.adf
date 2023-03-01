@@ -1,0 +1,19 @@
+{
+	"name": "HttpServer2",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": " https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000",
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Basic",
+			"userName": "srv_stage_denodo",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJkODE4NjRkMC1hYTBhLTRjMjYtYTI1Zi1jNWNkNTEyZmUzZGQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime2SelfHosted",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

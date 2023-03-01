@@ -9,7 +9,7 @@
 			"enableServerCertificateValidation": false,
 			"authenticationType": "Basic",
 			"userName": "srv_stage_denodo",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI5ZDQ5MDQwMC0zMzgwLTQyYjctOTYzYS1iZTA5MGFiZWQ1YWYiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJlNTRlNWEyYi1mNDhlLTRmOGEtOTY1Yy1iY2M2YTA2MjllYjAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "integrationRuntime2SelfHosted",

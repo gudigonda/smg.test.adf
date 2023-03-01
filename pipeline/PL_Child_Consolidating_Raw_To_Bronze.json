@@ -44,8 +44,8 @@
 						"referenceName": "DS_Raw_Source",
 						"type": "DatasetReference",
 						"parameters": {
-							"DS_Param_FolderPath": {
-								"value": "@pipeline().parameters.PL_Param_FolderPath",
+							"DS_Param_FolderPath_Raw": {
+								"value": "@pipeline().parameters.PL_Param_FolderPath_Raw",
 								"type": "Expression"
 							}
 						}
@@ -56,8 +56,8 @@
 						"referenceName": "DS_Bronze_Sink",
 						"type": "DatasetReference",
 						"parameters": {
-							"DS_Param_FolderPath_Sink": {
-								"value": "@pipeline().parameters.PL_Param_FolderPath_Sink",
+							"DS_Param_FolderPath_Bronze": {
+								"value": "@pipeline().parameters.PL_Param_FolderPath_Bronze",
 								"type": "Expression"
 							}
 						}
@@ -66,15 +66,15 @@
 			}
 		],
 		"parameters": {
-			"PL_Param_FolderPath": {
+			"PL_Param_FolderPath_Raw": {
 				"type": "string"
 			},
-			"PL_Param_FolderPath_Sink": {
+			"PL_Param_FolderPath_Bronze": {
 				"type": "string"
 			}
 		},
 		"annotations": [],
-		"lastPublishTime": "2023-01-24T15:26:15Z"
+		"lastPublishTime": "2023-02-28T11:04:33Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

@@ -1,9 +1,9 @@
 {
-	"name": "PL_Child_Archeiving_Raw_To_Bronze",
+	"name": "pipeline1",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy_Archiving",
+				"name": "Copy data1",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -16,45 +16,42 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "JsonSource",
+						"type": "BinarySource",
 						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"wildcardFileName": "*.json",
-							"enablePartitionDiscovery": false
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
 						},
 						"formatSettings": {
-							"type": "JsonReadSettings"
+							"type": "BinaryReadSettings"
 						}
 					},
 					"sink": {
-						"type": "JsonSink",
+						"type": "BinarySink",
 						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings",
-							"copyBehavior": "PreserveHierarchy"
-						},
-						"formatSettings": {
-							"type": "JsonWriteSettings"
+							"type": "AzureBlobFSWriteSettings"
 						}
 					},
 					"enableStaging": false
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_Bronze_Source",
-						"type": "DatasetReference"
+						"referenceName": "ElasticSearchDirect_Test",
+						"type": "DatasetReference",
+						"parameters": {
+							"elastic_search_url": " https://srv-stage-elas-rpt.servicemanagement.com:9200/v20_response_162_2022/response/_search?q=hasMessages:true;size=5000"
+						}
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_Bronze_Sink_Archive",
+						"referenceName": "DS_binary_sink",
 						"type": "DatasetReference"
 					}
 				]
 			}
 		],
 		"annotations": [],
-		"lastPublishTime": "2023-02-28T11:04:33Z"
+		"lastPublishTime": "2023-02-15T10:14:45Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

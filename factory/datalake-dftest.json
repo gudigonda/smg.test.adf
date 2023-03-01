@@ -1,0 +1,17 @@
+{
+	"name": "datalake-dftest",
+	"properties": {
+		"globalParameters": {
+			"ADLS": {
+				"type": "string",
+				"value": "dev"
+			}
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d24e6bc6-c0b7-4cc7-b3ad-4d0755e6896c",
+		"tenantId": "f08afdc4-69d3-44ad-93fa-30f2a90c14ea"
+	}
+}

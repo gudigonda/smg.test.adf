@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"DS_Param_FolderPath": {
+			"DS_Param_FolderPath_Raw": {
 				"type": "string"
 			}
 		},
@@ -16,7 +16,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"folderPath": {
-					"value": "@dataset().DS_Param_FolderPath",
+					"value": "@dataset().DS_Param_FolderPath_Raw",
 					"type": "Expression"
 				},
 				"fileSystem": "raw"

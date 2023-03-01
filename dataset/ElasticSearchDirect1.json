@@ -1,0 +1,23 @@
+{
+	"name": "ElasticSearchDirect1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HttpServer1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"elastic_search_url": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/_search?pretty"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

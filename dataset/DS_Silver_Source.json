@@ -1,0 +1,202 @@
+{
+	"name": "DS_Silver_Source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_smgblobgen2raw",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "v20_response_162_2022_01.json",
+				"folderPath": "TA/TA/123DSI/1234A/1234P/2023/01/20",
+				"fileSystem": "bronze"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"took": {
+					"type": "integer"
+				},
+				"timed_out": {
+					"type": "boolean"
+				},
+				"_shards": {
+					"type": "object",
+					"properties": {
+						"total": {
+							"type": "integer"
+						},
+						"successful": {
+							"type": "integer"
+						},
+						"skipped": {
+							"type": "integer"
+						},
+						"failed": {
+							"type": "integer"
+						}
+					}
+				},
+				"hits": {
+					"type": "object",
+					"properties": {
+						"total": {
+							"type": "integer"
+						},
+						"max_score": {
+							"type": "number"
+						},
+						"hits": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"_index": {
+										"type": "string"
+									},
+									"_type": {
+										"type": "string"
+									},
+									"_id": {
+										"type": "string"
+									},
+									"_score": {
+										"type": "number"
+									},
+									"_source": {
+										"type": "object",
+										"properties": {
+											"responseId": {
+												"type": "string"
+											},
+											"source": {
+												"type": "integer"
+											},
+											"eventDate": {
+												"type": "string"
+											},
+											"eventDateLocal": {
+												"type": "string"
+											},
+											"receivedDate": {
+												"type": "string"
+											},
+											"messageRevision": {
+												"type": "integer"
+											},
+											"messageTextJobId": {
+												"type": "integer"
+											},
+											"messages": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"properties": {
+														"originalText": {
+															"type": "string"
+														},
+														"textLanguage": {
+															"type": "string"
+														},
+														"originalTextLanguage": {
+															"type": "string"
+														},
+														"sentiment": {
+															"type": "number"
+														},
+														"fact": {
+															"type": "string"
+														},
+														"transcribed": {
+															"type": "boolean"
+														},
+														"languageId": {
+															"type": "string"
+														},
+														"messageId": {
+															"type": "integer"
+														},
+														"details": {
+															"type": "array"
+														},
+														"text": {
+															"type": "string"
+														},
+														"nSentiment": {
+															"type": "integer"
+														},
+														"sentimentAuditLog": {
+															"type": "array"
+														}
+													}
+												}
+											},
+											"hasMessages": {
+												"type": "boolean"
+											},
+											"facts": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"properties": {
+														"key": {
+															"type": "string"
+														},
+														"valueType": {
+															"type": "integer"
+														},
+														"stringValue": {
+															"type": "string"
+														}
+													}
+												}
+											},
+											"term": {
+												"type": "string"
+											},
+											"zoneContinent": {
+												"type": "integer"
+											},
+											"zone0": {
+												"type": "integer"
+											},
+											"zone1": {
+												"type": "integer"
+											},
+											"zone2": {
+												"type": "integer"
+											},
+											"unitId": {
+												"type": "integer"
+											},
+											"methodologyId": {
+												"type": "integer"
+											},
+											"externalLevel": {
+												"type": "string"
+											},
+											"externalKey": {
+												"type": "string"
+											},
+											"insertDateTime": {
+												"type": "string"
+											},
+											"updatedDateTime": {
+												"type": "string"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

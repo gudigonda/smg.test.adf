@@ -1,29 +1,29 @@
 {
-	"name": "DS_Bronze_Sink",
+	"name": "ElasticSearchHitsParquet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_smgblobgen2raw",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"DS_Param_FolderPath_Bronze": {
+			"parquet_directory": {
 				"type": "string"
 			}
 		},
 		"annotations": [],
-		"type": "Json",
+		"type": "Parquet",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "v20_response_162_2022_01.json",
 				"folderPath": {
-					"value": "@dataset().DS_Param_FolderPath_Bronze",
+					"value": "@dataset().parquet_directory",
 					"type": "Expression"
 				},
-				"fileSystem": "bronze"
-			}
+				"fileSystem": "elastictest"
+			},
+			"compressionCodec": "snappy"
 		},
-		"schema": {}
+		"schema": []
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }

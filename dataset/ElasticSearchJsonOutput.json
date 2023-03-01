@@ -1,12 +1,16 @@
 {
-	"name": "DS_Bronze_Sink",
+	"name": "ElasticSearchJsonOutput",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_smgblobgen2raw",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"DS_Param_FolderPath_Bronze": {
+			"foldername": {
+				"type": "string",
+				"defaultValue": "test"
+			},
+			"filename": {
 				"type": "string"
 			}
 		},
@@ -15,12 +19,15 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "v20_response_162_2022_01.json",
-				"folderPath": {
-					"value": "@dataset().DS_Param_FolderPath_Bronze",
+				"fileName": {
+					"value": "@dataset().filename",
 					"type": "Expression"
 				},
-				"fileSystem": "bronze"
+				"folderPath": {
+					"value": "@dataset().foldername",
+					"type": "Expression"
+				},
+				"fileSystem": "elastictest"
 			}
 		},
 		"schema": {}
