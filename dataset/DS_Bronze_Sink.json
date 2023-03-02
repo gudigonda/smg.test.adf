@@ -15,7 +15,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "v20_response_162_2022_01.json",
+				"fileName": {
+					"value": "@concat('v20_response_162_2022','_',formatDateTime(convertTimeZone(utcnow(),'UTC','Eastern Standard Time'),'yyyy-MM-ddTHHmmss'),'.json')",
+					"type": "Expression"
+				},
 				"folderPath": {
 					"value": "@dataset().DS_Param_FolderPath_Bronze",
 					"type": "Expression"

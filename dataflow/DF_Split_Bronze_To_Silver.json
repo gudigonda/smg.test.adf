@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "DS_SmgSourceFile",
+						"referenceName": "DS_Bronze_Source_Split",
 						"type": "DatasetReference"
 					},
 					"name": "SrcTAtables"
@@ -97,7 +97,7 @@
 				"          took as integer,",
 				"          timed_out as boolean,",
 				"          {_shards} as (total as integer, successful as integer, skipped as integer, failed as integer),",
-				"          hits as (total as integer, max_score as double, hits as ({_index} as string, {_type} as string, {_id} as string, {_score} as double, {_source} as (responseId as string, source as integer, eventDate as string, eventDateLocal as string, receivedDate as string, messageRevision as integer, messageTextJobId as integer, messages as (messageId as integer, fact as string, languageId as string, originalText as string, transcribed as boolean, sentiment as double, details as string[], nSentiment as integer, sMGNSentiment as integer, searchScore as double, textLanguage as string)[], hasMessages as boolean, facts as (key as string, valueType as integer, stringValue as string)[], term as string, zoneContinent as integer, zone0 as integer, zone1 as integer, zone2 as integer, unitId as integer, methodologyId as integer, externalLevel as string, externalKey as string, insertDateTime as string, updatedDateTime as string))[])",
+				"          hits as (total as integer, max_score as double, hits as ({_index} as string, {_type} as string, {_id} as string, {_score} as double, {_source} as (responseId as string, source as integer, eventDate as string, eventDateLocal as string, receivedDate as string, messageRevision as integer, messageTextJobId as integer, messages as (originalText as string, textLanguage as string, originalTextLanguage as string, sentiment as double, fact as string, transcribed as boolean, languageId as string, messageId as integer, details as string[], text as string, nSentiment as integer, sentimentAuditLog as string[])[], hasMessages as boolean, facts as (key as string, valueType as integer, stringValue as string)[], term as string, zoneContinent as integer, zone0 as integer, zone1 as integer, zone2 as integer, unitId as integer, methodologyId as integer, externalLevel as string, externalKey as string, insertDateTime as string, updatedDateTime as string))[])",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",

@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy_ES_To_Raw",
-				"type": "Copy",
+				"name": "Lookup_To_PassDates",
+				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -16,424 +16,102 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010",
-						"requestMethod": "GET",
-						"paginationRules": {
-							"supportRFC5988": "true"
-						}
-					},
-					"sink": {
-						"type": "JsonSink",
+						"type": "DelimitedTextSource",
 						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
-							"type": "JsonWriteSettings"
+							"type": "DelimitedTextReadSettings"
 						}
 					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['hits']['total']"
-								},
-								"sink": {
-									"name": "hits_total",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['max_score']"
-								},
-								"sink": {
-									"name": "max_score",
-									"type": "Decimal"
-								}
-							},
-							{
-								"source": {
-									"path": "$['took']"
-								},
-								"sink": {
-									"name": "took",
-									"type": "Int16"
-								}
-							},
-							{
-								"source": {
-									"path": "$['timed_out']"
-								},
-								"sink": {
-									"name": "timed_out",
-									"type": "Boolean"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_shards']['total']"
-								},
-								"sink": {
-									"name": "_shards_total",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_shards']['successful']"
-								},
-								"sink": {
-									"name": "successful",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_shards']['skipped']"
-								},
-								"sink": {
-									"name": "skipped"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_shards']['failed']"
-								},
-								"sink": {
-									"name": "failed",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_index']"
-								},
-								"sink": {
-									"name": "_index",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_type']"
-								},
-								"sink": {
-									"name": "_type",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_id']"
-								},
-								"sink": {
-									"name": "_id",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_score']"
-								},
-								"sink": {
-									"name": "_score",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messageTextJobId']"
-								},
-								"sink": {
-									"name": "messageTextJobId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['source']"
-								},
-								"sink": {
-									"name": "source",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['externalLevel']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_externalLevel",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['facts'][0]['dateValue']"
-								},
-								"sink": {
-									"name": "dateValue",
-									"type": "DateTime"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['facts'][0]['valueType']"
-								},
-								"sink": {
-									"name": "valueType",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['facts'][0]['key']"
-								},
-								"sink": {
-									"name": "key",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['hasMessages']"
-								},
-								"sink": {
-									"name": "hasMessages",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['externalKey']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_externalKey",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['eventDateLocal']"
-								},
-								"sink": {
-									"name": "eventDateLocal",
-									"type": "DateTime"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['historicalUnit']['externalKey']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_historicalUnit_externalKey",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['historicalUnit']['unitId']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_historicalUnit_unitId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['historicalUnit']['externalLevel']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_historicalUnit_externalLevel",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['historicalUnit']['units'][0]['externalKey']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_historicalUnit_units'][0]['externalKey",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['historicalUnit']['units'][0]['unitId']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_historicalUnit_units'][0]['unitId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['historicalUnit']['units'][0]['externalLevel']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_historicalUnit_units'][0]['externalLevel",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['originalText']"
-								},
-								"sink": {
-									"name": "originalText",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['sentiment']"
-								},
-								"sink": {
-									"name": "sentiment",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['fact']"
-								},
-								"sink": {
-									"name": "fact",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['transcribed']"
-								},
-								"sink": {
-									"name": "transcribed",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['languageId']"
-								},
-								"sink": {
-									"name": "languageId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['messageId']"
-								},
-								"sink": {
-									"name": "messageId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['details'][0]"
-								},
-								"sink": {
-									"name": "items",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messages'][0]['nSentiment']"
-								},
-								"sink": {
-									"name": "nSentiment",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['unitId']"
-								},
-								"sink": {
-									"name": "hits_hits'][0]['_source_unitId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['term']"
-								},
-								"sink": {
-									"name": "term",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['methodologyId']"
-								},
-								"sink": {
-									"name": "methodologyId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['messageRevision']"
-								},
-								"sink": {
-									"name": "messageRevision",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['receivedDate']"
-								},
-								"sink": {
-									"name": "receivedDate",
-									"type": "DateTime"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['responseId']"
-								},
-								"sink": {
-									"name": "responseId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['hits']['hits'][0]['_source']['eventDate']"
-								},
-								"sink": {
-									"name": "eventDate",
-									"type": "DateTime"
-								}
-							}
-						],
-						"collectionReference": ""
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_ES_TA_Tables",
+					"dataset": {
+						"referenceName": "DS_ES_Dates",
 						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_To_PassDates",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
-				"outputs": [
-					{
-						"referenceName": "DS_Raw_Sink",
-						"type": "DatasetReference"
-					}
-				]
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_To_PassDates').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "CopyData_ES_To_Raw",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_Rest_ES",
+									"type": "DatasetReference",
+									"parameters": {
+										"DS_ES_Index_Name": "v20_response_162_2022",
+										"DS_ES_WhereClause": "/_search?q=eventDate:",
+										"DS_ES_Date": {
+											"value": "@item().Date",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_Raw_Sink",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
 			}
 		],
 		"annotations": [],
-		"lastPublishTime": "2023-02-28T11:04:35Z"
+		"lastPublishTime": "2023-03-01T12:21:16Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

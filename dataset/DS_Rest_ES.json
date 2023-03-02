@@ -1,0 +1,32 @@
+{
+	"name": "DS_Rest_ES",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DS_ES_Index_Name": {
+				"type": "string",
+				"defaultValue": "v20_response_162_2022"
+			},
+			"DS_ES_WhereClause": {
+				"type": "string",
+				"defaultValue": "/_search?q=eventDate:"
+			},
+			"DS_ES_Date": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat(dataset().DS_ES_Index_Name,dataset().DS_ES_WhereClause,dataset().DS_ES_Date)",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
